@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="style.css">
+  <script src="index.js" async></script>
+
+  <title>Quiz de Conhecimentos Gerais</title>
+</head>
+<body>
+ 
+ <style>
+    * {
+        padding: 0;
+        margin: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        background-image: url("https://wallpapertag.com/wallpaper/full/e/2/a/118460-neutral-background-1920x1080-for-android-50.jpg");
+        color: #fff;
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .container {
+        background-color: #1c1c1e;
+        border: 2px solid #e1e1e6;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        text-align: center;
+    }
+
+    .questions-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 24px;
+    }
+
+    .question {
+        font-size: 24px;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .answers-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 16px;
+    }
+
+    .answer:disabled {
+        cursor: not-allowed;
+    }
+
+    .next-question {
+        margin-top: 32px;
+    }
+
+    .button {
+        background-color: #4863f7;
+        color: #fff;
+        font-size: 16px;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        padding: 12px 32px;
+        cursor: pointer;
+        transition: background-color 0.2s, transform 0.2s;
+    }
+
+    .button:hover {
+        background-color: #3858c7;
+        transform: scale(1.05);
+    }
+
+    /* Finish game */
+    .final-message {
+        font-size: 20px;
+        text-align: center;
+        margin-top: 20px;
+    }
+
+    .final-message span {
+        display: block;
+        margin-top: 8px;
+    }
+
+    /* General styles */
+    .hide {
+        display: none;
+    }
+
+    .correct {
+        background-color: #049b48;
+    }
+
+    .incorrect {
+        background-color: #a10101;
+    }
+
+ </style>
+ 
+    <div class="container">
+    <div class="questions-container hide">
+      <span class="question">Pergunta aqui?</span>
+      <div class="answers-container">
+        <button class="answer button">Resposta 1</button>
+        <button class="answer button">Resposta 2</button>
+        <button class="answer button">Resposta 3</button>
+        <button class="answer button">Resposta 4</button>
+      </div>
+    </div>
+    <div class="controls-container">
+      <button class="start-quiz button">Começar Quiz!</button>
+      <button class="next-question button hide">Próxima pergunta</button>
+    </div>
+  </div>
+
+<script>
+
+    const $startGameButton = document.querySelector(".start-quiz")
+    const $nextQuestionButton = document.querySelector(".next-question")
+    const $questionsContainer = document.querySelector(".questions-container")
+    const $questionText = document.querySelector(".question")
+    const $answersContainer = document.querySelector(".answers-container")
+    const $answers = document.querySelectorAll(".answer")
+    
+    let currentQuestionIndex = 0
+    let totalCorrect = 0
+    
+    $startGameButton.addEventListener("click", startGame)
+    $nextQuestionButton.addEventListener("click", displayNextQuestion)
+    
+    function startGame() {
+      $startGameButton.classList.add("hide")
+      $questionsContainer.classList.remove("hide")
+      displayNextQuestion()
+    }
+    
+    function displayNextQuestion() {
+      resetState()
+      
+      if (questions.length === currentQuestionIndex) {
+        return finishGame()
+      }
+    
+      $questionText.textContent = questions[currentQuestionIndex].question
+      questions[currentQuestionIndex].answers.forEach(answer => {
+        const newAsnwer = document.createElement("button")
+        newAsnwer.classList.add("button", "answer")
+        newAsnwer.textContent = answer.text
+        if (answer.correct) {
+          newAsnwer.dataset.correct = answer.correct
+        }
+        $answersContainer.appendChild(newAsnwer)
+    
+        newAsnwer.addEventListener("click", selectAnswer)
+      })
+    }
+    
+    function resetState() {
+      while($answersContainer.firstChild) {
+        $answersContainer.removeChild($answersContainer.firstChild)
+      }
+    
+      document.body.removeAttribute("class")
+      $nextQuestionButton.classList.add("hide")
+    }
+    
+    function selectAnswer(event) {
+      const answerClicked = event.target
+    
+      if (answerClicked.dataset.correct) {
+        document.body.classList.add("correct")
+        totalCorrect++
+      } else {
+        document.body.classList.add("incorrect") 
+      }
+    
+      document.querySelectorAll(".answer").forEach(button => {
+        button.disabled = true
+    
+        if (button.dataset.correct) {
+          button.classList.add("correct")
+        } else {
+          button.classList.add("incorrect")
+        }
+      })
+      
+      $nextQuestionButton.classList.remove("hide")
+      currentQuestionIndex++
+    }
+    
+    function finishGame() {
+      const totalQuestions = questions.length
+      const performance = Math.floor(totalCorrect * 100 / totalQuestions)
+      
+      let message = ""
+    
+      switch (true) {
+        case (performance >= 90):
+          message = "Excelente :)"
+          break
+        case (performance >= 70):
+          message = "Muito bom :)"
+          break
+        case (performance >= 50):
+          message = "Bom"
+          break
+        default:
+          message = "Pode melhorar :("
+      }
+    
+      $questionsContainer.innerHTML = 
+      `
+        <p class="final-message">
+          Você acertou ${totalCorrect} de ${totalQuestions} questões!
+          <span>Resultado: ${message}</span>
+        </p>
+        <button 
+          onclick=window.location.reload() 
+          class="button"
+        >
+          Refazer teste
+        </button>
+      `
+    }
+    
+    
+    const questions = [
+    {
+        question: "Normalmente, quantos litros de sangue uma pessoa tem? Em média, quantos são retirados numa doação de sangue?",
+        answers: [
+            { text: "a) Tem entre 2 a 4 litros. São retirados 450 mililitros", correct: false },
+            { text: "b) Tem entre 4 a 6 litros. São retirados 450 mililitros", correct: true },
+            { text: "c) Tem 10 litros. São retirados 2 litros", correct: false },
+            { text: "d) Tem 7 litros. São retirados 1,5 litros", correct: false },
+            { text: "e) Tem 0,5 litros. São retirados 0,5 litros", correct: false }
+        ]
+    },
+    {
+        question: "De quem é a famosa frase “Penso, logo existo”?",
+        answers: [
+            { text: "a) Platão", correct: false },
+            { text: "b) Galileu Galilei", correct: false },
+            { text: "c) Descartes", correct: true },
+            { text: "d) Sócrates", correct: false },
+            { text: "e) Francis Bacon", correct: false }
+        ]
+    },
+    {
+        question: "De onde é a invenção do chuveiro elétrico?",
+        answers: [
+            { text: "a) França", correct: false },
+            { text: "b) Inglaterra", correct: false },
+            { text: "c) Brasil", correct: true },
+            { text: "d) Austrália", correct: false },
+            { text: "e) Itália", correct: false }
+        ]
+    },
+    {
+        question: "Quais o menor e o maior país do mundo?",
+        answers: [
+            { text: "a) Vaticano e Rússia", correct: true },
+            { text: "b) Nauru e China", correct: false },
+            { text: "c) Mônaco e Canadá", correct: false },
+            { text: "d) Malta e Estados Unidos", correct: false },
+            { text: "e) São Marino e Índia", correct: false }
+        ]
+    },
+    {
+        question: "Qual o nome do presidente do Brasil que ficou conhecido como Jango?",
+        answers: [
+            { text: "a) Jânio Quadros", correct: false },
+            { text: "b) Jacinto Anjos", correct: false },
+            { text: "c) Getúlio Vargas", correct: false },
+            { text: "d) João Figueiredo", correct: false },
+            { text: "e) João Goulart", correct: true }
+        ]
+    },
+    {
+        question: "Qual o grupo em que todas as palavras foram escritas corretamente?",
+        answers: [
+            { text: "a) Asterístico, beneficiente, meteorologia, entertido", correct: false },
+            { text: "b) Asterisco, beneficente, meteorologia, entretido", correct: true },
+            { text: "c) Asterisco, beneficente, metereologia, entretido", correct: false },
+            { text: "d) Asterístico, beneficiente, metereologia, entretido", correct: false },
+            { text: "e) Asterisco, beneficiente, metereologia, entretido", correct: false }
+        ]
+    },
+    {
+        question: "Qual o livro mais vendido no mundo a seguir à Bíblia?",
+        answers: [
+            { text: "a) O Senhor dos Anéis", correct: false },
+            { text: "b) Dom Quixote", correct: true },
+            { text: "c) O Pequeno Príncipe", correct: false },
+            { text: "d) Ela, a Feiticeira", correct: false },
+            { text: "e) Um Conto de Duas Cidades", correct: false }
+        ]
+    },
+    {
+        question: "Quantas casas decimais tem o número pi?",
+        answers: [
+            { text: "a) Duas", correct: false },
+            { text: "b) Centenas", correct: false },
+            { text: "c) Infinitas", correct: true },
+            { text: "d) Vinte", correct: false },
+            { text: "e) Milhares", correct: false }
+        ]
+    }
+];
+
+</script>
+
+</body>
+</html>
