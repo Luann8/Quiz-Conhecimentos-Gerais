@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="shortcut icon" href="https://raw.githubusercontent.com/Luann8/Quiz-Cyberseguranca/main/OIG.ico" type="image/x-icon">
-  <title>Quiz de Conhecimentos Gerais</title>
+  <title>Quiz de Cybersegurança</title>
   </head>
   <body>
  
@@ -17,7 +17,7 @@
       }
       
       body {
-        background-image: url("https://wallpapertag.com/wallpaper/full/e/2/a/118460-neutral-background-1920x1080-for-android-50.jpg");
+        background-image: url("https://th.bing.com/th/id/R.1f7f7da68f4d01cca39b25391b78f517?rik=ITluD4Q5oaxCbw&riu=http%3a%2f%2fwww.mx-itsolutions.de%2fimages%2fiacf5.jpg&ehk=AoLZ0OKuLX%2bCqRu6b3skDi9eP%2fSDGQ%2f4%2b8FbWAdTYO8%3d&risl=&pid=ImgRaw&r=0");
         color: #fff;
         font-family: Arial, sans-serif;
         display: flex;
@@ -107,134 +107,141 @@
 
  </style>
  
-    <div class="container">
-    <div class="questions-container hide">
-      <span class="question">Pergunta aqui?</span>
-      <div class="answers-container">
-        <button class="answer button">Resposta 1</button>
-        <button class="answer button">Resposta 2</button>
-        <button class="answer button">Resposta 3</button>
-        <button class="answer button">Resposta 4</button>
-      </div>
-    </div>
-    <div class="controls-container">
-      <button class="start-quiz button">Começar Quiz!</button>
-      <button class="next-question button hide">Próxima pergunta</button>
-    </div>
-  </div>
+   <title>Quiz JavaScript</title>
+ </head>
+ <body>
+   <div class="container">
+     <div class="questions-container hide">
+       <span class="question">Pergunta aqui?</span>
+       <div class="answers-container">
+         <button class="answer button">Resposta 1</button>
+         <button class="answer button">Resposta 2</button>
+         <button class="answer button">Resposta 3</button>
+         <button class="answer button">Resposta 4</button>
+       </div>
+     </div>
+     <div class="controls-container">
+       <button class="start-quiz button">Começar Quiz!</button>
+       <button class="next-question button hide">Próxima pergunta</button>
+     </div>
+   </div>
+ </body>
+ </html>
+ 
 
 <script>
 
-    const $startGameButton = document.querySelector(".start-quiz")
-    const $nextQuestionButton = document.querySelector(".next-question")
-    const $questionsContainer = document.querySelector(".questions-container")
-    const $questionText = document.querySelector(".question")
-    const $answersContainer = document.querySelector(".answers-container")
-    const $answers = document.querySelectorAll(".answer")
+  const $startGameButton = document.querySelector(".start-quiz")
+  const $nextQuestionButton = document.querySelector(".next-question")
+  const $questionsContainer = document.querySelector(".questions-container")
+  const $questionText = document.querySelector(".question")
+  const $answersContainer = document.querySelector(".answers-container")
+  const $answers = document.querySelectorAll(".answer")
+  
+  let currentQuestionIndex = 0
+  let totalCorrect = 0
+  
+  $startGameButton.addEventListener("click", startGame)
+  $nextQuestionButton.addEventListener("click", displayNextQuestion)
+  
+  function startGame() {
+    $startGameButton.classList.add("hide")
+    $questionsContainer.classList.remove("hide")
+    displayNextQuestion()
+  }
+  
+  function displayNextQuestion() {
+    resetState()
     
-    let currentQuestionIndex = 0
-    let totalCorrect = 0
-    
-    $startGameButton.addEventListener("click", startGame)
-    $nextQuestionButton.addEventListener("click", displayNextQuestion)
-    
-    function startGame() {
-      $startGameButton.classList.add("hide")
-      $questionsContainer.classList.remove("hide")
-      displayNextQuestion()
+    if (questions.length === currentQuestionIndex) {
+      return finishGame()
     }
-    
-    function displayNextQuestion() {
-      resetState()
-      
-      if (questions.length === currentQuestionIndex) {
-        return finishGame()
+  
+    $questionText.textContent = questions[currentQuestionIndex].question
+    questions[currentQuestionIndex].answers.forEach(answer => {
+      const newAsnwer = document.createElement("button")
+      newAsnwer.classList.add("button", "answer")
+      newAsnwer.textContent = answer.text
+      if (answer.correct) {
+        newAsnwer.dataset.correct = answer.correct
       }
-    
-      $questionText.textContent = questions[currentQuestionIndex].question
-      questions[currentQuestionIndex].answers.forEach(answer => {
-        const newAsnwer = document.createElement("button")
-        newAsnwer.classList.add("button", "answer")
-        newAsnwer.textContent = answer.text
-        if (answer.correct) {
-          newAsnwer.dataset.correct = answer.correct
-        }
-        $answersContainer.appendChild(newAsnwer)
-    
-        newAsnwer.addEventListener("click", selectAnswer)
-      })
+      $answersContainer.appendChild(newAsnwer)
+  
+      newAsnwer.addEventListener("click", selectAnswer)
+    })
+  }
+  
+  function resetState() {
+    while($answersContainer.firstChild) {
+      $answersContainer.removeChild($answersContainer.firstChild)
     }
-    
-    function resetState() {
-      while($answersContainer.firstChild) {
-        $answersContainer.removeChild($answersContainer.firstChild)
-      }
-    
-      document.body.removeAttribute("class")
-      $nextQuestionButton.classList.add("hide")
+  
+    document.body.removeAttribute("class")
+    $nextQuestionButton.classList.add("hide")
+  }
+  
+  function selectAnswer(event) {
+    const answerClicked = event.target
+  
+    if (answerClicked.dataset.correct) {
+      document.body.classList.add("correct")
+      totalCorrect++
+    } else {
+      document.body.classList.add("incorrect") 
     }
-    
-    function selectAnswer(event) {
-      const answerClicked = event.target
-    
-      if (answerClicked.dataset.correct) {
-        document.body.classList.add("correct")
-        totalCorrect++
+  
+    document.querySelectorAll(".answer").forEach(button => {
+      button.disabled = true
+  
+      if (button.dataset.correct) {
+        button.classList.add("correct")
       } else {
-        document.body.classList.add("incorrect") 
+        button.classList.add("incorrect")
       }
+    })
     
-      document.querySelectorAll(".answer").forEach(button => {
-        button.disabled = true
+    $nextQuestionButton.classList.remove("hide")
+    currentQuestionIndex++
+  }
+  
+  function finishGame() {
+    const totalQuestions = questions.length
+    const performance = Math.floor(totalCorrect * 100 / totalQuestions)
     
-        if (button.dataset.correct) {
-          button.classList.add("correct")
-        } else {
-          button.classList.add("incorrect")
-        }
-      })
-      
-      $nextQuestionButton.classList.remove("hide")
-      currentQuestionIndex++
+    let message = ""
+  
+    switch (true) {
+      case (performance >= 90):
+        message = "Excelente :)"
+        break
+      case (performance >= 70):
+        message = "Muito bom :)"
+        break
+      case (performance >= 50):
+        message = "Bom"
+        break
+      default:
+        message = "Pode melhorar :("
     }
+  
+    $questionsContainer.innerHTML = 
+    `
+      <p class="final-message">
+        Você acertou ${totalCorrect} de ${totalQuestions} questões!
+        <span>Resultado: ${message}</span>
+      </p>
+      <button 
+        onclick=window.location.reload() 
+        class="button"
+      >
+        Refazer teste
+      </button>
+    `
+  }
+  
+  
     
-    function finishGame() {
-      const totalQuestions = questions.length
-      const performance = Math.floor(totalCorrect * 100 / totalQuestions)
-      
-      let message = ""
-    
-      switch (true) {
-        case (performance >= 90):
-          message = "Excelente :)"
-          break
-        case (performance >= 70):
-          message = "Muito bom :)"
-          break
-        case (performance >= 50):
-          message = "Bom"
-          break
-        default:
-          message = "Pode melhorar :("
-      }
-    
-      $questionsContainer.innerHTML = 
-      `
-        <p class="final-message">
-          Você acertou ${totalCorrect} de ${totalQuestions} questões!
-          <span>Resultado: ${message}</span>
-        </p>
-        <button 
-          onclick=window.location.reload() 
-          class="button"
-        >
-          Refazer teste
-        </button>
-      `
-    }
-    
-    
-    const questionsCybersecurity = [
+    const questions  = [
     {
         question: "O que é engenharia social?",
         answers: [
